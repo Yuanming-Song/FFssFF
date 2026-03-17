@@ -1,0 +1,14 @@
+*.dcd
+*.xtc
+*.coor
+*.vel
+*.xsc
+*.xsc.old
+*.coor.old
+*.vel.old
+*.out
+*.err
+*.log
+*.tpr
+*.gro
+*.trr

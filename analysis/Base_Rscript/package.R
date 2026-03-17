@@ -1,0 +1,13 @@
+.libPaths("/dfs9/tw/yuanmis1/R_libs")
+library(sna)
+library(doParallel)
+library(bio3d)
+library(bigmemory)
+library(geometry)
+library(dplyr)
+library(tidyr)
+library(pracma)
+library(Rcpp)
+corenum=24
+corenum=detectCores()
+registerDoParallel(cores = corenum)

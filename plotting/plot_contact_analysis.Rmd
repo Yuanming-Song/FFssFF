@@ -1,0 +1,120 @@
+---
+title: "Contact Analysis Plots"
+output: 
+  pdf_document:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# Define main directory
+main_dir <- "/Users/song/Documents/Research/HPC/dfs2/mrsec/FFssFF"
+
+# Define step for analysis
+step <- 10  # Process every 10th frame
+
+# Load necessary libraries
+library(ggplot2)
+library(plotly)
+library(readxl)
+library(scales)
+library(grid)
+library(cowplot)
+
+# Required packages
+required_packages <- c("ggplot2", "dplyr", "tidyr", "gridExtra")
+
+# Function to safely load packages
+load_packages <- function(packages) {
+    for (package in packages) {
+        if (!requireNamespace(package, quietly = TRUE)) {
+            install.packages(package)
+            library(package, character.only = TRUE)
+        } else {
+            library(package, character.only = TRUE)
+        }
+    }
+}
+
+# Load required packages
+load_packages(required_packages)
+
+# Define base theme
+plttheme <- theme(
+    panel.background = element_rect(fill='transparent'),
+    text = element_text(size=12),
+    legend.direction = "horizontal",
+    legend.position = "bottom",
+    legend.key = element_rect(fill = "transparent"),
+    axis.line = element_line(colour = "black", size = 0.3),
+    legend.text = element_text(size = 10),
+    legend.title = element_text(size = 12),
+    plot.title = element_text(size = 12),
+    legend.background = element_rect(fill = "transparent")
+)
+```
+
+```{r plot_CG_contacts, fig.width=6.5, fig.height=8.0, dpi=1100}
+# Text size control - Must be defined before sourcing script
+plot_title_size <- 10
+axis_title_size <- 10
+axis_text_size <- 6
+legend_title_size <- 8
+legend_text_size <- 6
+
+# Define text theme
+text_theme <- theme(
+    plot.title = element_text(size = plot_title_size),
+    axis.title = element_text(size = axis_title_size),
+    axis.text = element_text(size = axis_text_size),
+    legend.title = element_text(size = legend_title_size),
+    legend.text = element_text(size = legend_text_size)
+)
+
+# Combine themes
+pltthemetemp <- plttheme + text_theme
+
+# Control settings
+save_plots <- FALSE
+pltsavedir <- file.path(main_dir, "CG_analysis/contact_analysis/output/")
+plot_dpi <- 1100
+plot_width <- 6.5
+plot_height <- 8.0
+
+# Define script path
+script_path <- file.path(main_dir, "Plotting/plot_contact_analysis.R")
+source(script_path)
+```
+
+```{r plot_AA_contacts, fig.width=6.5, fig.height=8.0, dpi=1100}
+# Text size control - Must be defined before sourcing script
+plot_title_size <- 10
+axis_title_size <- 10
+axis_text_size <- 6
+legend_title_size <- 8
+legend_text_size <- 6
+
+# Define text theme
+text_theme <- theme(
+    plot.title = element_text(size = plot_title_size),
+    axis.title = element_text(size = axis_title_size),
+    axis.text = element_text(size = axis_text_size),
+    legend.title = element_text(size = legend_title_size),
+    legend.text = element_text(size = legend_text_size)
+)
+
+# Combine themes
+pltthemetemp <- plttheme + text_theme
+
+# Control settings
+save_plots <- FALSE
+pltsavedir <- file.path(main_dir, "AA/Analysis/contact_analysis/output/")
+plot_dpi <- 1100
+plot_width <- 6.5
+plot_height <- 8.0
+
+# Define script path
+script_path <- file.path(main_dir, "Plotting/plot_AA_contact_analysis.R")
+source(script_path)
+``` 

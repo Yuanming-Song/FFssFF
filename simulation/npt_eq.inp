@@ -1,0 +1,145 @@
+#############################################################
+## JOB DESCRIPTION                                         ##
+#############################################################
+
+# NPT equilibration of solvated FFssFF multi-chain system.
+# Minimization (10k steps) + gradual harmonic constraint release.
+# Template: adjust Dir, cellBasisVector, and FF paths for your system.
+
+#############################################################
+## ADJUSTABLE PARAMETERS                                   ##
+#############################################################
+
+set Dir /dfs9/tw/yuanmis1/mrsec/FFssFF/AA_setup/
+set DirFF /dfs9/tw/yuanmis1/mrsec/ff/
+set sysfile ${Dir}FFssFF_Base_mix_water_ions
+set outfile npt_eq
+set temperature    297.15
+
+structure          $sysfile.psf
+coordinates        $sysfile.pdb
+
+outputName         $outfile
+
+# Continuing a job from the restart files
+if {0} {
+set inputname      npt01
+binCoordinates     $inputname.coor
+binVelocities      $inputname.vel  ;# remove the "temperature" entry if you use this!
+extendedSystem	   $inputname.xsc
+} 
+
+#firsttimestep      0
+
+
+#############################################################
+## SIMULATION PARAMETERS                                   ##
+#############################################################
+
+# Force field parameters
+paraTypeCharmm	    on
+parameters          /dfs9/tw/yuanmis1/mrsec/ff/toppar_water_ions_jaf_cgenff.str
+parameters          ${DirFF}toppar_c36_jul22/par_all36_cgenff.prm
+parameters           /dfs9/tw/yuanmis1/mrsec/FFssFF/AA/Single/Base/FFssFF_base.str
+
+
+# NOTE: Do not set the initial velocity temperature if you 
+# have also specified a .vel restart file!
+temperature         $temperature
+ 
+
+# Periodic Boundary Conditions
+# NOTE: Do not set the periodic cell basis if you have also 
+# specified an .xsc restart file!
+if {1} { 
+cellBasisVector1     125     0.0     0.0
+cellBasisVector2     0.0       125   0.0
+cellBasisVector3     0.0        0.0    125
+cellOrigin          0.0 0.0 0.0
+}
+
+
+# Force-Field Parameters
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              12.0
+switching           on
+vdwForceSwitching   yes
+LJcorrection	yes
+switchdist          10.0
+pairlistdist        16.0
+
+
+# Integrator Parameters
+timestep            1.0  ;# 1fs/step
+rigidBonds          all  ;# 
+nonbondedFreq       1
+fullElectFrequency  2  
+stepspercycle       20
+
+
+#PME (for full-system periodic electrostatics)
+# values of 30, 32, 36, 40, 45, 48, 50, 54, 60, 64, 72, 75, 80, 81, 90, 96,  100, 120, 128
+if {1} {
+PME                 yes
+PMEInterpOrder       6
+PMEGridSpacing          1.0
+}
+
+
+# Constant Temperature Control
+langevin            on    ;# do langevin dynamics
+langevinDamping     1     ;# damping coefficient (gamma) of 1/ps
+langevinTemp        $temperature
+
+# Constant Pressure Control (variable volume)
+if {1} {
+useGroupPressure      yes ;# 
+useFlexibleCell       no  ;# no for water box, yes for membrane
+
+langevinPiston        on
+langevinPistonTarget  1.01325 ;#  in bar -> 1 atm
+langevinPistonPeriod  200.0
+langevinPistonDecay   50.0
+langevinPistonTemp    $temperature
+}
+
+
+restartfreq        10000     ;# 1000steps = every 1ps
+restartname ${outfile}
+dcdfreq            10000
+#xstFreq            10000
+outputEnergies     10000 
+outputTiming	   10000
+#outputPressure      
+#binaryoutput        no
+
+
+#############################################################
+## EXTRA PARAMETERS                                        ##
+#############################################################
+
+# Put here any custom parameters that are specific to 
+# this job (e.g., SMD, TclForces, etc...)
+if {1} {
+constraints on
+consexp 2
+consref $sysfile.cons.pdb
+conskfile $sysfile.cons.pdb
+conskcol B
+}
+
+#############################################################
+## EXECUTION SCRIPT                                        ##
+#############################################################
+
+minimize 10000
+run 5000
+
+if {1} {
+foreach i {0.5 0.25 0.1 0.05} {
+	constraintScaling $i
+	run 5000
+}
+}
+
