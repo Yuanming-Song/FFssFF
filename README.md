@@ -1,23 +1,31 @@
 # FFssFF All-Atom MD Simulations
 
+**Code written by Yuanming Song.**
+
 Simulation scripts and analysis code for the paper:
 
 > **Nanoscale Interfacial Organization Governs Maturation and Collapse in Passive Versus Active Condensates**
 
-All-atom molecular dynamics simulations of the self-assembling peptide **FFssFF** (Phe-Phe-Ser-Ser-Phe-Phe), studying aggregation under different pH conditions, solvent environments, and concentrations.
+## Background
 
-**Code written by Yuanming Song. README and code comments co-written with LLM coding tools.**
+FFssFF (bis(phenylalanyl-phenylalanyl) cystamine) is a short peptide that undergoes pH-dependent phase separation driven by hydrophobic interactions between phenylalanine dipeptides. These droplets can be reversibly formed and dissolved by controlling redox chemistry. All-atom MD simulations were performed to understand the intermolecular interactions within different regions of FFssFF coacervate droplets. Acidic (+2 charged) vs. basic (neutral) conditions were compared to examine whether redox-responsive aggregation behavior is captured by the force field. Basic solvated vs. vacuum simulations serve as proxies for the hydrated outer layer and dense, dehydrated core of FFssFF droplets, as observed in cryo-TEM images. Additional simulations at elevated concentrations probe concentration-dependent aggregation.
+
+## Force Field
+
+FFssFF force field parameters were generated using the CHARMM General Force Field (CGenFF) program version 3.0 with CGenFF version 4.6. The parameter files are provided in `forcefield/`.
 
 ## Systems
 
-| System | pH | Environment | # Molecules | Box (Å) | Conc. (mM) | Setup modifications |
+All production runs performed on NVIDIA A30 GPUs using NAMD 3.0alpha13. All systems contain 32 FFssFF molecules initially arranged on a 5x5x5 lattice.
+
+| System | Charge | Environment | Box (Å) | Conc. (mM) | Speed (ns/day) | Setup modifications |
 |---|---|---|---|---|---|---|
-| Acid in water | Acidic | Solvated | 32 | 125 | ~29 | Use `FFssFF_Acid.str`, `FFssFF_only_Acid.pdb` |
-| Base in water | Basic | Solvated | 32 | 125 | ~29 | Use `FFssFF_base.str`, `FFssFF_only_base.pdb` |
-| Base in vacuum | Basic | Vacuum | 32 | 125 (lattice) | — | Use `nvt_eq.inp`/`nvt01.inp` instead of NPT |
-| Base high conc. 1 | Basic | Solvated | 32 | 100 | ~53 | Change `set a 100.` in `setUpMix.tcl` |
-| Base high conc. 2 | Basic | Solvated | 32 | 85 | ~87 | Change `set a 85.` in `setUpMix.tcl` |
-| Base high conc. 3 | Basic | Solvated | 32 | 74 | ~131 | Change `set a 74.` in `setUpMix.tcl` |
+| Acid in water | +2 | Solvated | 125 | ~29 | ~20 | Use `FFssFF_Acid.str`, `FFssFF_only_Acid.pdb` |
+| Base in water | Neutral | Solvated | 125 | ~29 | ~11 | Use `FFssFF_base.str`, `FFssFF_only_base.pdb` |
+| Base in vacuum | Neutral | Vacuum | 125 | — | ~143 | Use `nvt_eq.inp`/`nvt01.inp` instead of NPT |
+| Base high conc. 1 | Neutral | Solvated | 100 | ~53 | ~21 | Change `set a 100.` in `setUpMix.tcl` |
+| Base high conc. 2 | Neutral | Solvated | 85 | ~87 | ~39 | Change `set a 85.` in `setUpMix.tcl` |
+| Base high conc. 3 | Neutral | Solvated | 74 | ~131 | ~50 | Change `set a 74.` in `setUpMix.tcl` |
 
 ## Prerequisites
 
@@ -30,7 +38,7 @@ All-atom molecular dynamics simulations of the self-assembling peptide **FFssFF*
 
 ```
 forcefield/         FFssFF-specific force field parameters and input PDBs
-simulation/         Template setup, equilibration, production, and SLURM scripts
+simulation/         Template VMD setup and NAMD config files
 analysis/           Contact analysis R scripts and output data
   Base_Rscript/     Shared R function library
   output/           Pre-computed .rda data and plots
@@ -60,9 +68,9 @@ Edit `simulation/npt_eq.inp`:
 - Set `Dir` to point to where the setup outputs are
 - Set `cellBasisVector` to match box size
 
-Submit (CPU):
+Run with NAMD (CPU multicore recommended):
 ```bash
-sbatch namd_eq.slurm
+namd3 +p <ncpus> npt_eq.inp
 ```
 
 ### 3. Production
@@ -70,14 +78,9 @@ sbatch namd_eq.slurm
 Edit `simulation/npt01.inp`:
 - Set `Dir` to match
 
-Submit (GPU):
+Run with NAMD (GPU recommended):
 ```bash
-sbatch namd.cuda.slurm
-```
-
-For continuation runs:
-```bash
-bash conti.sh && sbatch namd.cuda.slurm
+namd3 +p <ncpus> +devices <gpu_id> npt01.inp
 ```
 
 ### 4. Vacuum Simulations
@@ -92,7 +95,7 @@ Use `nvt_eq.inp` and `nvt01.inp` instead of the NPT configs. No solvation step �
 # For the 3 original systems (Acid, Base, Dry)
 sbatch analysis/run_contact_analysis.slurm
 
-# For the concentration sweep (high1, high2, high3)
+# For the higher concentration sweep (high1, high2, high3)
 sbatch analysis/run_contact_analysis_conc.slurm
 ```
 
@@ -113,8 +116,11 @@ Rscript -e "rmarkdown::render('plotting/plot_contact_analysis.Rmd')"
 | Pressure | 1 atm (NPT) |
 | Timestep | 2 fs (production), 1 fs (equilibration) |
 | Electrostatics | PME (order 6, 1.0 Å grid) |
-| Cutoff | 12 Å, switching from 10 Å |
+| Cutoff | 12 Å |
 | Thermostat | Langevin (γ = 1 ps⁻¹) |
 | Barostat | Langevin piston (200 ps period, 50 ps decay) |
-| Ionic strength | 0.250 M NaCl |
 | Output frequency | 10,000 steps (20 ps) |
+
+---
+
+*README co-generated with LLM coding tools.*
