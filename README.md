@@ -8,7 +8,7 @@ Simulation scripts and analysis code for the paper:
 
 ## Background
 
-FFssFF (bis(phenylalanyl-phenylalanyl) cystamine) is a short peptide that undergoes pH-dependent phase separation driven by hydrophobic interactions between phenylalanine dipeptides. These droplets can be reversibly formed and dissolved by controlling redox chemistry. All-atom MD simulations were performed to understand the intermolecular interactions within different regions of FFssFF coacervate droplets. Acidic (+2 charged) vs. basic (neutral) conditions were compared to examine whether redox-responsive aggregation behavior is captured by the force field. Basic solvated vs. vacuum simulations serve as proxies for the hydrated outer layer and dense, dehydrated core of FFssFF droplets, as observed in cryo-TEM images. Additional simulations at elevated concentrations probe concentration-dependent aggregation.
+FFssFF (bis(phenylalanyl-phenylalanyl) cystamine) is a short peptide that undergoes pH-dependent phase separation driven by hydrophobic interactions between phenylalanine dipeptides. These droplets can be reversibly formed and dissolved by controlling redox chemistry. All-atom MD simulations were performed to understand the intermolecular interactions within different regions of FFssFF coacervate droplets. Acidic (+2 charged) vs. basic (neutral) conditions were compared to examine whether redox-responsive aggregation behavior is captured by the force field. Basic solvated vs. vacuum simulations serve as proxies for the hydrated outer layer and dense, dehydrated core of FFssFF droplets, as observed in cryo-TEM images. Additional simulations at elevated concentrations probe concentration-dependent aggregation and interactions.
 
 ## Force Field
 
