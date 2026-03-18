@@ -12,3 +12,4 @@
 *.tpr
 *.gro
 *.trr
+*.slurm
