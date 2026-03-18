@@ -91,20 +91,6 @@ Use `nvt_eq.inp` and `nvt01.inp` instead of the NPT configs. No solvation step â
 
 ### Contact Analysis
 
-```bash
-# For the 3 original systems (Acid, Base, Dry)
-sbatch analysis/run_contact_analysis.slurm
-
-# For the higher concentration sweep (high1, high2, high3)
-sbatch analysis/run_contact_analysis_conc.slurm
-```
-
-### Plotting
-
-Open `plotting/plot_contact_analysis.Rmd` in RStudio or run:
-```bash
-Rscript -e "rmarkdown::render('plotting/plot_contact_analysis.Rmd')"
-```
 
 ## Simulation Parameters
 
